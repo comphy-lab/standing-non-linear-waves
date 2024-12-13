@@ -1,12 +1,14 @@
 /**
  * @file  StokesStandingWaves.c
- * @brief Simulation of standing waves. 
+ * @brief Simulation of standing waves using the Basilisk flow solver. 
  * @author Vatsal Sanjay
  * @version 0.1
  * @date Dec 13, 2024
-
+ *
 ## Description:
- * This code simulates the dynamics of a standing Stokes wave. 
+ * This code simulates the dynamics of a standing Stokes wave using adaptive mesh refinement. 
+ * The simulation uses a two-phase flow solver with surface tension and implements both
+ * analytical Stokes wave solutions and experimental best-fit initial conditions.
  * 
  * Usage:
  * ./program maxLevel We Ohd tf Ohs De Ec tmax
@@ -27,9 +29,9 @@
  * Air-water viscosity ratio (2e-2) is used for ambient air - drop (very easy to change).
  * Drop-shell and shell-air surface tensions are the same (both equal to 1). In the future, might be instructive to test with different surface tensions. Also, in that case, we must decide which surface tension will be 1.
 
-## Reating variables:
- * Radius of the drop (without the shell). 
- * Surface tension (currently both shell-drop and shell-air are the same).
+## Repeating variables:
+ * Wavelength of the standing wave.
+ * Acceleration due to gravity.
  * Density of the drop (currently, both shell and drop densities are the same).
 */
 
@@ -40,15 +42,17 @@
 #include "reduced.h"
 #include "distance.h"
 
-#define tsnap (1e-2) // 0.001 only for some cases. 
-// Error tolerancs
-#define fErr (1e-3)                                 // error tolerance in f1 VOF
-#define KErr (1e-6)                                 // error tolerance in VoF curvature calculated using heigh function method (see adapt event)
+/**
+ * @brief Error tolerance parameters for numerical stability and accuracy
+ */
+#define tsnap (1e-2) // Time interval between snapshots. Use 0.001 only for specific cases requiring higher temporal resolution.
+// Error tolerances
+#define fErr (1e-3)                                 // error tolerance in f1 VOF (Volume of Fluid)
+#define KErr (1e-6)                                 // error tolerance in VOF curvature calculated using height function method
 #define VelErr (1e-3)                               // error tolerances in velocity -- Use 1e-2 for low Oh and 1e-3 to 5e-3 for high Oh/moderate to high J
 
-// Numbers!
+// Domain size
 #define Ldomain 2.0
-
 
 int MAXlevel;
 // Ga -> Gallileo number 
@@ -100,6 +104,11 @@ int  main(int argc, char const *argv[]) {
   run();
 }
 
+/**
+ * @brief Calculates the Stokes coefficient for nth order wave
+ * @param n Order of the wave
+ * @return Coefficient value based on double factorial calculation
+ */
 double stokes_coefficient (int n) {
   if (n == 1) return 1.0;
   int k = 2*n - 1;
@@ -109,6 +118,14 @@ double stokes_coefficient (int n) {
   return double_factorial / (pow(2,(n-1)) * tgamma(n+1));
 }
 
+/**
+ * @brief Calculates the surface elevation for Stokes wave
+ * @param x Horizontal position
+ * @param a Wave amplitude
+ * @param k Wave number
+ * @param order Order of Stokes expansion
+ * @return Surface elevation at position x
+ */
 double eta_stokes (double x, double a, double k, int order) {
   double eta = 0.0;
   double epsilon = k*a;
@@ -119,6 +136,10 @@ double eta_stokes (double x, double a, double k, int order) {
   return eta * a;
 }
 
+/**
+ * @brief Initializes the simulation domain and wave profile
+ * Either uses analytical Stokes wave solution or reads experimental best-fit data
+ */
 event init (t = 0) {
   if (!restore (file = dumpFile)) {
     refine (y > -1.25*A0 && y < 1.25*A0 && level < MAXlevel);
@@ -191,29 +212,43 @@ event end (t = end) {
 
 /**
 ## Log writing
-*/
+ * @brief Logs simulation data and implements stopping criteria
+ * Records:
+ * - Kinetic energy
+ * - Maximum and minimum surface positions
+ * - Simulation parameters
+ * 
+ * Stopping conditions:
+ * - Kinetic energy exceeds 1e2 (blow-up)
+ * - Kinetic energy falls below 1e-6 (stagnation)
+ */
 event logWriting (i++) {
   double ke = 0.;
   foreach (reduction(+:ke)){
     ke += (0.5*rho(f[])*(sq(u.x[]) + sq(u.y[])))*sq(Delta);
   }
 
+  scalar pos[];
+  position (f, pos, {0,1});
+  double max = statsf(pos).max;
+  double min = statsf(pos).min;
+
   if (pid() == 0) {
     static FILE * fp;
     if (i == 0) {
       fprintf(ferr, "Level %d, Ga %2.1e, Bo %2.1e, A0 %2.1e\n", MAXlevel, Ga, Bo, A0);
-      fprintf (ferr, "i dt t ke\n");
+      fprintf (ferr, "i dt t ke at\n");
       fp = fopen (logFile, "w");
       fprintf(fp, "Level %d, Ga %2.1e, Bo %2.1e, A0 %2.1e\n", MAXlevel, Ga, Bo, A0);
-      fprintf (fp, "i dt t ke\n");
-      fprintf (fp, "%d %g %g %g\n", i, dt, t, ke);
+      fprintf (fp, "i dt t ke at\n");
+      fprintf (fp, "%d %g %g %g %g\n", i, dt, t, ke, max-min);
       fclose(fp);
     } else {
       fp = fopen (logFile, "a");
-      fprintf (fp, "%d %g %g %g\n", i, dt, t, ke);
+      fprintf (fp, "%d %g %g %g %g\n", i, dt, t, ke, max-min);
       fclose(fp);
     }
-    fprintf (ferr, "%d %g %g %g\n", i, dt, t, ke);
+    fprintf (ferr, "%d %g %g %g %g\n", i, dt, t, ke, max-min);
 
     assert(ke > -1e-10);
 
