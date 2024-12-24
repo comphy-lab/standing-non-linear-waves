@@ -14,8 +14,8 @@
  * ./StokesStandingWaves maxLevel Ga Bo A0 ORDER tmax
  * where:
  *   maxLevel: Maximum refinement level for adaptive mesh
- *   Ga: Gallileo number (ratio of gravitational to viscous forces)
- *   Bo: Bond number (ratio of gravitational to surface tension forces)
+ *   Ga: Gallileo number (ratio of gravitational to viscous forces): this is $\frac{\rho^2 g\, \lambda^3}{\eta^2}$
+ *   Bo: Bond number (ratio of gravitational to surface tension forces): this is $\rho_l g \lambda^2/\gamma$
  *   A0: Amplitude of the standing wave
  *   ORDER: Order of the initial condition: 0,1,2...6,upto 8.. or if you use -1, it uses the best fit. see [../initialConditionTest](../initialConditionTest)
  *   tmax: Maximum simulation time
