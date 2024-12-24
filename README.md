@@ -3,6 +3,9 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![GitHub issues](https://img.shields.io/github/issues/comphy-lab/standing-non-linear-waves)](https://github.com/comphy-lab/standing-non-linear-waves/issues)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14551990.svg)](https://doi.org/10.5281/zenodo.14551990)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/comphy-lab/standing-non-linear-waves)](https://github.com/comphy-lab/standing-non-linear-waves/releases)
+[![GitHub last commit](https://img.shields.io/github/last-commit/comphy-lab/standing-non-linear-waves)](https://github.com/comphy-lab/standing-non-linear-waves/commits)
+[![Language](https://img.shields.io/github/languages/top/comphy-lab/standing-non-linear-waves)](https://github.com/comphy-lab/standing-non-linear-waves)
 
 This repository contains simulation code for studying the dynamics of standing non-linear waves using the Basilisk flow solver. The code implements both analytical Stokes wave solutions and experimental best-fit initial conditions to investigate wave dynamics with adaptive mesh refinement.
 
