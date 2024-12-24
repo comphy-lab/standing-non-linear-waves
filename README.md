@@ -1,6 +1,8 @@
 # Standing Non-Linear Waves
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![GitHub issues](https://img.shields.io/github/issues/comphy-lab/standing-non-linear-waves)](https://github.com/comphy-lab/standing-non-linear-waves/issues)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14551990.svg)](https://doi.org/10.5281/zenodo.14551990)
 
 This repository contains simulation code for studying the dynamics of standing non-linear waves using the Basilisk flow solver. The code implements both analytical Stokes wave solutions and experimental best-fit initial conditions to investigate wave dynamics with adaptive mesh refinement.
 
@@ -180,18 +182,25 @@ Common issues and solutions:
 - Vatsal Sanjay (University of Twente)
   - Email: vatsalsanjay@gmail.com
 
+## Contributing
+
+If you encounter any issues or have suggestions for improvements, please feel free to [open an issue](https://github.com/vatsal-agarwal-20/standing-non-linear-waves/issues) on GitHub. We welcome bug reports, feature requests, and general feedback to help improve the project.
+
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
 
 ## Citation
 
 If you use this code in your research, please cite:
 
 ```bibtex
-@software{sanjay2024standing,
-    author = {Vatsal Sanjay},
-    title = {Standing Non-Linear Waves},
-    year = {2024},
-    url = {https://github.com/VatsalSy/standing-non-linear-waves}
+@software{vatsal_sanjay_2024_14551990,
+  author       = {Vatsal Sanjay},
+  title        = {comphy-lab/standing-non-linear-waves: Standing Non-Linear Waves – First Official Release -- v1.0},
+  year         = {2024},
+  publisher    = {Zenodo},
+  version      = {v1.0},
+  doi          = {10.5281/zenodo.14551990},
+  url          = {https://doi.org/10.5281/zenodo.14551990}
 }
