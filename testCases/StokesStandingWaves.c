@@ -3,36 +3,47 @@
  * @brief Simulation of standing waves using the Basilisk flow solver. 
  * @author Vatsal Sanjay
  * @version 0.1
- * @date Dec 13, 2024
+ * @date Dec 24, 2024
  *
 ## Description:
- * This code simulates the dynamics of a standing Stokes wave using adaptive mesh refinement. 
- * The simulation uses a two-phase flow solver with surface tension and implements both
- * analytical Stokes wave solutions and experimental best-fit initial conditions.
+ * This code simulates the dynamics of standing waves using adaptive mesh refinement. 
+ * The simulation uses a two-phase flow solver with surface tension and implements
+ * analytical Stokes wave solutions or experimental best-fit initial conditions.
  * 
  * Usage:
- * ./program maxLevel We Ohd tf Ohs De Ec tmax
+ * ./StokesStandingWaves maxLevel Ga Bo A0 ORDER tmax
  * where:
  *   maxLevel: Maximum refinement level for adaptive mesh
- *   We: Weber number (ratio of kinetic energy to surface energy)
- *   Ohd: Ohnesorge number for the drop (ratio of viscous to inertial-capillary forces)
- *   tf: thickness of the shell
- *   Ohs: Ohnesorge number for the shell (ratio of viscous to inertial-capillary forces) -- note that this is the solvent viscosity of the shell. In case of purely elastic (rather Kelvin–Voigt) shell, it is the background viscosity responsible for dissipation in solids.
- *   De: Deborah number (ratio of relaxation time to flow time). For Elastic/Kelvin–Voigt solids, keep this at 1e30 (hard coded to be infinity).
- *   Ec: Elasto-capillary number (ratio of elastic to surface tension forces) of the shell. 
+ *   Ga: Gallileo number (ratio of gravitational to viscous forces)
+ *   Bo: Bond number (ratio of gravitational to surface tension forces)
+ *   A0: Amplitude of the standing wave
+ *   ORDER: Order of the initial condition: 0,1,2...6,upto 8.. or if you use -1, it uses the best fit. see [../initialConditionTest](../initialConditionTest)
  *   tmax: Maximum simulation time
-
-## Some assumptions to start with:
- * No gravity (easy to change).
- * No contact between the compound drop and the substrate (not planned to be added in the future).
- * Shell - drop density ratio is 1 (very easy to change).
- * Air-water viscosity ratio (2e-2) is used for ambient air - drop (very easy to change).
- * Drop-shell and shell-air surface tensions are the same (both equal to 1). In the future, might be instructive to test with different surface tensions. Also, in that case, we must decide which surface tension will be 1.
-
-## Repeating variables:
- * Wavelength of the standing wave.
- * Acceleration due to gravity.
- * Density of the drop (currently, both shell and drop densities are the same).
+ *
+## Key Features:
+ * Two-phase flow with surface tension
+ * Adaptive mesh refinement for interface tracking
+ * Choice between analytical Stokes wave or experimental best-fit initial conditions
+ * Volume of Fluid (VoF) method for interface tracking
+ *
+## Physical Parameters:
+ * Density ratio (rho1/rho2): 1000 (water-air like)
+ * Viscosity ratio (mu2/mu1): 0.01 (water-air like)
+ * Surface tension coefficient: 1.0/Bo
+ * Gravity: -1.0 (non-dimensionalized)
+ *
+## Numerical Parameters:
+ * Time interval between snapshots: tsnap = 1e-2
+ * Error tolerances:
+   - VOF (f): fErr = 1e-3
+   - Curvature (K): KErr = 1e-6
+   - Velocity: VelErr = 1e-3 (adjust based on Oh number)
+ * Domain size: 2.0 × 2.0
+ *
+## Reference Variables:
+ * Length scale: Wavelength of the standing wave
+ * Time scale: Based on gravitational acceleration
+ * All quantities are dimensionless
 */
 
 #include "navier-stokes/centered.h"
@@ -70,7 +81,7 @@ int  main(int argc, char const *argv[]) {
   /*
   Values taken from the terminal. Here we use some representative values. In production run, you can pass it from the command line.
   */
-  MAXlevel = 8; //atoi(argv[1]);
+  MAXlevel = 7; //atoi(argv[1]);
   Ga = 1e6;
   Bo = 1e1;
   A0 = 0.1;
@@ -172,7 +183,7 @@ event init (t = 0) {
     // to calculate the value of this function at each vertex. 
       vertex scalar phi[];
       foreach_vertex(){
-        phi[] = -(d[] + d[-1] + d[0,-1] + d[-1,-1])/4.;
+        phi[] = (d[] + d[-1] + d[0,-1] + d[-1,-1])/4.;
       }
       
     // We can now initialize the volume fraction of the domain. 

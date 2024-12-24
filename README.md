@@ -62,17 +62,15 @@ qcc -O2 -Wall -disable-dimensions StokesStandingWaves.c -o StokesStandingWaves -
 
 The program accepts the following parameters:
 ```bash
-./StokesStandingWaves maxLevel We Ohd tf Ohs De Ec tmax
+./StokesStandingWaves maxLevel Ga Bo A0 ORDER tmax
 ```
 
 where:
-- `maxLevel`: Maximum refinement level for adaptive mesh
-- `We`: Weber number
-- `Ohd`: Ohnesorge number for the drop
-- `tf`: Shell thickness
-- `Ohs`: Shell Ohnesorge number
-- `De`: Deborah number
-- `Ec`: Elasto-capillary number
+- `maxLevel`: Maximum refinement level for adaptive mesh (default: 7)
+- `Ga`: Gallileo number (ratio of gravitational to viscous forces)
+- `Bo`: Bond number (ratio of gravitational to surface tension forces)
+- `A0`: Amplitude of the standing wave
+- `ORDER`: Order of the initial condition (0-8, or -1 for best fit)
 - `tmax`: Maximum simulation time
 
 ## Features
@@ -91,17 +89,96 @@ where:
 - Adaptive mesh refinement with error control
 - Stokes wave analytical solutions
 
+### Physical Parameters
+- Density ratio (rho1/rho2): 1000 (water-air like)
+- Viscosity ratio (mu2/mu1): 0.01 (water-air like)
+- Surface tension coefficient: 1.0/Bo
+- Gravity: -1.0 (dimensionless)
+
 ### Simulation Parameters
 - Domain size: 2.0 × 2.0
 - Error tolerances:
-  - VOF: 1e-3
-  - Curvature: 1e-6
-  - Velocity: 1e-3
+  - VOF: 1e-3 (interface tracking)
+  - Curvature: 1e-6 (height function method)
+  - Velocity: 1e-3 (adjust based on Oh number)
+- Grid resolution: 128 points per unit length (in post-processing)
+
+## Post-Processing Protocol
+
+The simulation output can be processed using a suite of tools in the `postProcessScripts/` directory. These tools generate visualizations and extract quantitative data from the simulation results.
+
+### Quick Start
+
+1. Navigate to your test case directory:
+```bash
+cd testCases/
+```
+
+2. Run the post-processing script:<br>
+-> The folderToProcess is the name of the folder containing the simulation results (this folder will contain the intermediate folder with all the simulation snapshots).
+```bash
+./postProcessData.sh <folderToProcess>
+```
+
+### Components and Tools
+
+#### 1. Post-Processing Script (`postProcessData.sh`)
+- Main script that orchestrates the post-processing workflow
+- Copies required executables and scripts to the working directory
+- Executes visualization and data extraction routines
+- Cleans up temporary files after processing
+
+#### 2. Visualization (`video.py`)
+- Python script for generating visualizations and videos
+- Features:
+  - Custom color maps for better visualization
+  - LaTeX-rendered labels and annotations
+  - Automated video generation of wave evolution
+- Dependencies:
+  - NumPy
+  - Matplotlib
+  - Subprocess
+  - Multiprocessing for parallel processing
+
+#### 3. Data Extraction Tools
+- `getData`: Extracts field data (velocity, pressure, etc.)
+  - Usage: `./getData filename zmin rmin zmax rmax nr`
+  - Outputs: Field values on specified grid points
+
+- `getFacets`: Extracts interface geometry
+  - Usage: `./getFacets filename`
+  - Outputs: Interface segments as coordinate pairs
+
+### Output Files
+
+The post-processing generates several types of output:
+1. Video files showing wave evolution
+2. Data files containing:
+   - Grid points (X, Y)
+   - velocity magnitude field `vel` (saved as vel_rot)
+   - vorticity field `omega` (saved as omega_rot)
+   - the vof field `f` (saved as f_rot).
+   - Field values (`ux`, `uy`) -- saved as (ux_rot, uy_rot)
+
+### Customization
+
+The visualization parameters can be customized in `video.py`:
+- Grid resolution
+- Color schemes
+- Plot dimensions
+- Output format and quality
+
+### Troubleshooting
+
+Common issues and solutions:
+1. Missing executables: Ensure `getData` and `getFacets` are compiled
+2. Python dependencies: Install required packages using pip
+3. Permission issues: Make sure all scripts are executable (`chmod +x`)
 
 ## Project Team
 
 - Vatsal Sanjay (University of Twente)
-  - Email: v.sanjay@utwente.nl
+  - Email: vatsalsanjay@gmail.com
 
 ## License
 

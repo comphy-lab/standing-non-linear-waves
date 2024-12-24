@@ -7,7 +7,8 @@
 **/*.tags*
 **/*.deps
 **/*.tests
-**/*.s*
+**/*.s
+**/*.s.d
 **/Video
 **/*.mp4
 **/*.json
@@ -95,3 +96,8 @@ deps/
 .Trashes
 ehthumbs.db
 Thumbs.db
+postProcessScripts/getData
+postProcessScripts/getFacets
+testCases/getData
+testCases/getFacets
+testCases/video.py
