@@ -81,7 +81,7 @@ int  main(int argc, char const *argv[]) {
   /*
   Values taken from the terminal. Here we use some representative values. In production run, you can pass it from the command line.
   */
-  MAXlevel = 7; //atoi(argv[1]);
+  MAXlevel = 11; //atoi(argv[1]);
   Ga = 1e6;
   Bo = 1e1;
   A0 = 0.1;
