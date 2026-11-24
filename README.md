@@ -18,27 +18,27 @@ The project focuses on simulating standing waves using a two-phase flow solver w
 
 ## Installation and Setup
 
-To ensure you have the necessary tools and a fresh Basilisk installation, use the provided script:
+To build the Basilisk source committed in `basilisk/`, use the provided script:
 
 ```bash
 ./reset_install_requirements.sh
 ```
 
 ### Function
-This script checks for Basilisk installation and compiles it if not present.
+This script compiles the committed Basilisk source. It downloads nothing.
 
 ### OS Compatibility
 Designed for macOS and Linux systems.
 
 ### Dependencies
-- Basilisk C (automatically installed)
+- Basilisk C (committed in `basilisk/`, built by the script)
 - C compiler (gcc/clang)
 - Make build system
 
 ### Environment Setup
 After running the script, a `.project_config` file is created, setting `BASILISK` and `PATH` automatically.
 
-For a fresh installation:
+To rebuild from scratch (the source itself is not replaced):
 ```bash
 ./reset_install_requirements.sh --hard
 ```
